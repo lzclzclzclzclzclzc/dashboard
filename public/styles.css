@@ -1,0 +1,397 @@
+:root {
+  --ink: #151515;
+  --muted: #6d706d;
+  --paper: #f4f1ea;
+  --panel: #fffaf0;
+  --line: #d8d0c2;
+  --green: #237a57;
+  --red: #bf3f35;
+  --blue: #286f9b;
+  --gold: #c78f2d;
+  --shadow: 0 22px 60px rgba(38, 31, 20, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: "Aptos", "Segoe UI", sans-serif;
+  background:
+    linear-gradient(90deg, rgba(21, 21, 21, 0.035) 1px, transparent 1px),
+    linear-gradient(rgba(21, 21, 21, 0.035) 1px, transparent 1px),
+    var(--paper);
+  background-size: 28px 28px;
+}
+
+.shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 40px;
+}
+
+.topbar,
+.metric-head,
+.chart-head,
+.status {
+  display: flex;
+  align-items: center;
+}
+
+.topbar {
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  color: var(--green);
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: clamp(32px, 5vw, 58px);
+  line-height: 0.95;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+.status {
+  flex: 0 0 auto;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  background: rgba(255, 250, 240, 0.72);
+  border-radius: 8px;
+}
+
+.pulse {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--gold);
+  box-shadow: 0 0 0 6px rgba(199, 143, 45, 0.16);
+}
+
+.pulse.ok {
+  background: var(--green);
+  box-shadow: 0 0 0 6px rgba(35, 122, 87, 0.16);
+}
+
+.pulse.bad {
+  background: var(--red);
+  box-shadow: 0 0 0 6px rgba(191, 63, 53, 0.16);
+}
+
+.hero-grid,
+.chart-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.hero-grid {
+  grid-template-columns: minmax(280px, 1.15fr) minmax(240px, 0.92fr) minmax(320px, 1.18fr);
+  grid-template-areas:
+    "cpu memory balance"
+    "cpu disk balance";
+  align-items: stretch;
+}
+
+.chart-grid {
+  grid-template-columns: 1fr 1fr;
+  margin-top: 16px;
+}
+
+.metric,
+.chart-card {
+  border: 1px solid var(--line);
+  background: rgba(255, 250, 240, 0.86);
+  box-shadow: var(--shadow);
+  border-radius: 8px;
+}
+
+.metric {
+  min-height: 214px;
+  padding: 18px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-card {
+  min-height: 308px;
+  padding: 18px;
+  min-width: 0;
+}
+
+.metric.primary {
+  grid-area: cpu;
+  background: #181818;
+  color: #fff8eb;
+}
+
+.metric:nth-child(2) {
+  grid-area: memory;
+}
+
+.metric:nth-child(3) {
+  grid-area: disk;
+}
+
+.metric.balance {
+  grid-area: balance;
+}
+
+.metric-head {
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--muted);
+  min-width: 0;
+}
+
+.metric-head span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.05;
+  font-size: 24px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: bold;
+  color: var(--ink);
+}
+
+.primary .metric-head span {
+  color: #c7c1b5;
+}
+
+.chart-head {
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.chart-head strong {
+  color: var(--ink);
+  font-size: 30px;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.primary .metric-head {
+  color: #c7c1b5;
+}
+
+.metric-head strong {
+  flex: 0 0 auto;
+  color: inherit;
+  font-size: 28px;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.ring {
+  width: 200px;
+  height: 200px;
+  margin: 28px auto 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: conic-gradient(var(--gold) calc(var(--value) * 1%), rgba(255, 255, 255, 0.12) 0);
+  position: relative;
+}
+
+.ring::after {
+  content: "";
+  position: absolute;
+  inset: 20px;
+  border-radius: inherit;
+  background: #181818;
+}
+
+.ring span {
+  position: relative;
+  z-index: 1;
+  font-size: 36px;
+  font-weight: 800;
+}
+
+.metric p {
+  margin: 12px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.primary p {
+  color: #c7c1b5;
+}
+
+.bar {
+  height: 14px;
+  overflow: hidden;
+  margin: auto 0 18px;
+  background: #e6ded0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.bar span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), var(--blue));
+  transition: width 500ms ease;
+}
+
+.bar.drive span {
+  background: linear-gradient(90deg, var(--red), var(--gold), var(--green));
+}
+
+.balance-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.balance-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  min-width: 0;
+}
+
+.balance-item span {
+  font-size: 20px;
+}
+
+.daily-item span {
+  min-width: 0;
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+
+.balance-item b {
+  flex: 0 0 auto;
+  font-size: 27px;
+}
+
+.daily-usage {
+  margin-top: 25px;
+  padding-top: 10px;
+}
+
+.daily-usage > span {
+  display: block;
+  color: var(--muted);
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.daily-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  color: var(--ink);
+  min-width: 0;
+  margin-top: 17px;
+}
+
+
+.daily-item b {
+  flex: 0 0 auto;
+  font-size: 26px;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 218px;
+}
+
+.spark {
+  display: flex;
+  align-items: end;
+  gap: 3px;
+  height: 34px;
+  margin-top: 30px;
+}
+
+.spark span {
+  width: 100%;
+  min-height: 3px;
+  background: var(--gold);
+  border-radius: 4px 4px 0 0;
+}
+
+.muted {
+  font-size: 13px;
+}
+
+.metric.balance .muted {
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+#balanceStatus {
+  font-size: 21px;
+}
+
+@media (max-width: 980px) {
+  .hero-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "cpu memory"
+      "disk balance";
+  }
+
+  .chart-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .shell {
+    width: min(100% - 20px, 1180px);
+    padding-top: 18px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .hero-grid,
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-grid {
+    grid-template-areas:
+      "cpu"
+      "memory"
+      "disk"
+      "balance";
+  }
+
+  .status {
+    width: 100%;
+  }
+}

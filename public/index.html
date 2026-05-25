@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="apple-touch-icon" sizes="256x256" href="/icon.png">
+    <link rel="icon" sizes="256x256" href="/icon.png">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Claw Local Telemetry</p>
+          <h1>Dashboard for lzc's Laptop</h1>
+        </div>
+        <div class="status">
+          <span class="pulse"></span>
+          <span id="statusText">Connecting</span>
+        </div>
+      </header>
+
+      <section class="hero-grid">
+        <article class="metric primary">
+          <div class="metric-head">
+            <span>CPU</span>
+            <strong id="cpuPercent">--%</strong>
+          </div>
+          <div class="ring" style="--value: 0">
+            <span id="cpuRing">--%</span>
+          </div>
+          <p id="cpuModel">Reading</p>
+          <div class="spark" id="cpuSpark"></div>
+        </article>
+
+        <article class="metric">
+          <div class="metric-head">
+            <span>Memory</span>
+            <strong id="memPercent">--%</strong>
+          </div>
+          <div class="bar"><span id="memBar"></span></div>
+          <p><b id="memUsed">--</b> / <span id="memTotal">--</span></p>
+        </article>
+
+        <article class="metric">
+          <div class="metric-head">
+            <span>C: Free Space</span>
+            <strong id="diskPercent">--%</strong>
+          </div>
+          <div class="bar drive"><span id="diskBar"></span></div>
+          <p><b id="diskFree">--</b> / <span id="diskTotal">--</span></p>
+        </article>
+
+        <article class="metric balance">
+          <div class="metric-head">
+            <span>DeepSeek Balance</span>
+            <strong id="balanceStatus">--</strong>
+          </div>
+          <div id="balanceList" class="balance-list"></div>
+          <div class="daily-usage">
+            <span>Today's Usage</span>
+            <div id="dailyUsageList">--</div>
+          </div>
+          <p class="muted">Key: <span id="keyMask">--</span></p>
+        </article>
+      </section>
+
+      <section class="chart-grid">
+        <article class="chart-card">
+          <div class="chart-head">
+            <div>
+              <p class="eyebrow">Last 60 Seconds</p>
+              <h2>CPU Trend</h2>
+            </div>
+            <strong id="cpuChartValue">--%</strong>
+          </div>
+          <canvas id="cpuChart" width="720" height="260"></canvas>
+        </article>
+
+        <article class="chart-card">
+          <div class="chart-head">
+            <div>
+              <p class="eyebrow">Last 60 Seconds</p>
+              <h2>Memory Trend</h2>
+            </div>
+            <strong id="memChartValue">--%</strong>
+          </div>
+          <canvas id="memoryChart" width="720" height="260"></canvas>
+        </article>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

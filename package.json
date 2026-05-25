@@ -1,0 +1,12 @@
+{
+  "name": "claw-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local system and DeepSeek usage dashboard",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
