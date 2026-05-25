@@ -23,6 +23,8 @@ Create a `.env` file in the project root:
 ```env
 DEEPSEEK_API_KEY=sk-your-key-here
 PORT=3000
+LIBRE_HARDWARE_MONITOR_URL=http://192.168.18.154:8085/data.json
+CPU_POWER_SENSOR_ID=/intelcpu/0/power/0
 ```
 
 Install dependencies if needed. This project currently uses only Node.js built-in modules, so there is nothing to install.
@@ -55,3 +57,13 @@ initial balance for today - current balance
 ```
 
 If the account is topped up during the day, the value may become negative.
+
+## CPU Power
+
+CPU power is read from LibreHardwareMonitor's remote web server. The default sensor is:
+
+```text
+/intelcpu/0/power/0
+```
+
+If the sensor path changes, update `CPU_POWER_SENSOR_ID` in `.env`.

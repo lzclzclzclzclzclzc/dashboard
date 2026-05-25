@@ -102,12 +102,14 @@ function renderLineChart(canvas, values, color) {
 function renderSystem(data) {
   const cpu = data.cpu.percent;
   const memory = data.memory.percent;
+  const cpuPower = data.cpu.power_watts;
+  const hasCpuPower = typeof cpuPower === "number";
   pushSample(cpuHistory, cpu);
   pushSample(memoryHistory, memory);
 
   setText("cpuPercent", `${cpu}%`);
-  setText("cpuRing", `${cpu}%`);
-  $("cpuRing").parentElement.style.setProperty("--value", cpu);
+  setText("cpuRing", hasCpuPower ? `${cpuPower}W` : "--W");
+  $("cpuRing").parentElement.style.setProperty("--value", hasCpuPower ? Math.min(100, (cpuPower / 40) * 100) : 0);
   setText("cpuModel", data.cpu.model);
   renderSpark(cpu);
 

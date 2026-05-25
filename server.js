@@ -15,6 +15,8 @@ loadEnv(path.join(ROOT, ".env"));
 
 const PORT = Number(process.env.PORT || 3000);
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || "";
+const LHM_DATA_URL = process.env.LIBRE_HARDWARE_MONITOR_URL || "http://192.168.18.154:8085/data.json";
+const CPU_POWER_SENSOR_ID = process.env.CPU_POWER_SENSOR_ID || "/intelcpu/0/power/0";
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -24,6 +26,7 @@ const MIME = {
 };
 
 let previousCpu = readCpuSnapshot();
+let cpuPowerCache = { at: 0, value: null, retryAfter: 0 };
 
 function loadEnv(file) {
   if (!fs.existsSync(file)) return;
@@ -131,6 +134,8 @@ async function getDeepSeekBalance() {
 
 async function getMetrics() {
   const [drive, deepseek] = await Promise.all([getDriveUsage(), getDeepSeekSnapshot()]);
+  const cpu = getCpuUsage();
+  cpu.power_watts = await getCpuPowerWatts();
   return {
     at: new Date().toISOString(),
     host: {
@@ -138,14 +143,16 @@ async function getMetrics() {
       platform: `${os.type()} ${os.release()}`,
       uptime: os.uptime()
     },
-    cpu: getCpuUsage(),
+    cpu,
     memory: getMemoryUsage(),
     drive,
     deepseek
   };
 }
 
-function getSystemMetrics() {
+async function getSystemMetrics() {
+  const cpu = getCpuUsage();
+  cpu.power_watts = await getCpuPowerWatts();
   return {
     at: new Date().toISOString(),
     host: {
@@ -153,7 +160,7 @@ function getSystemMetrics() {
       platform: `${os.type()} ${os.release()}`,
       uptime: os.uptime()
     },
-    cpu: getCpuUsage(),
+    cpu,
     memory: getMemoryUsage()
   };
 }
@@ -173,6 +180,58 @@ async function getDeepSeekSnapshot() {
     balance,
     daily: getDeepSeekDaily(balance)
   };
+}
+
+async function getCpuPowerWatts() {
+  const now = Date.now();
+  if (now < cpuPowerCache.retryAfter) return cpuPowerCache.value;
+  if (now - cpuPowerCache.at < 900) return cpuPowerCache.value;
+
+  try {
+    const data = await fetchJsonWithTimeout(LHM_DATA_URL, 2500);
+    const sensor = findSensor(data, (node) => node.SensorId === CPU_POWER_SENSOR_ID)
+      || findSensor(data, (node) => node.Type === "Power" && /cpu package/i.test(node.Text || ""))
+      || findSensor(data, (node) => node.Type === "Power" && /cpu/i.test(node.Text || ""));
+    const watts = sensor ? parseSensorNumber(sensor.RawValue || sensor.Value) : null;
+    cpuPowerCache = {
+      at: now,
+      value: watts,
+      retryAfter: watts === null ? now + 5000 : now
+    };
+    return watts;
+  } catch {
+    cpuPowerCache = { at: now, value: null, retryAfter: now + 5000 };
+    return null;
+  }
+}
+
+async function fetchJsonWithTimeout(url, timeoutMs) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { signal: controller.signal, cache: "no-store" });
+    if (!response.ok) throw new Error(`LibreHardwareMonitor returned ${response.status}`);
+    return await response.json();
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function findSensor(node, predicate) {
+  if (!node || typeof node !== "object") return null;
+  if (predicate(node)) return node;
+  for (const child of node.Children || []) {
+    const found = findSensor(child, predicate);
+    if (found) return found;
+  }
+  return null;
+}
+
+function parseSensorNumber(value) {
+  const match = String(value || "").match(/-?\d+(?:\.\d+)?/);
+  if (!match) return null;
+  const number = Number(match[0]);
+  return Number.isFinite(number) ? Number(number.toFixed(1)) : null;
 }
 
 function getDeepSeekDaily(balance) {
@@ -304,7 +363,7 @@ const server = http.createServer(async (request, response) => {
       return;
     }
     if (request.method === "GET" && url.pathname === "/api/system") {
-      sendJson(response, 200, getSystemMetrics());
+      sendJson(response, 200, await getSystemMetrics());
       return;
     }
     if (request.method === "GET" && url.pathname === "/api/drive") {
